@@ -16,6 +16,7 @@ import { MoviesDto } from './dto';
 import { AWSService } from 'aws/aws.service';
 import { failResponse, successResponse } from 'helper/reponse.helper';
 import { ShowTimeService } from 'src/show-time/show-time.service';
+import { FilterShowTimeDto } from 'src/show-time/dto/showTime.dto';
 @Controller('movies')
 @UseInterceptors()
 export class MoviesController {
@@ -124,9 +125,9 @@ export class MoviesController {
   }
 
   @Get('list/movie-available')
-  async getAvailableFilms() {
+  async getAvailableFilms(@Query() query:FilterShowTimeDto) {
     const availableShowTime =
-      await this.showTimeService.getAllAvailableShowTime();
+      await this.showTimeService.getAllAvailableShowTime(query);
 
     if (availableShowTime.length === 0)
       return failResponse({
@@ -136,7 +137,6 @@ export class MoviesController {
     const availableMovies = await this.movieService.getAvailableMovies(
       availableShowTime,
     );
-    console.log(availableMovies);
     return successResponse({
       message: 'Get Movie sucesssfully',
       payload: availableMovies,

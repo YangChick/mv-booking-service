@@ -93,7 +93,8 @@ export class ShowTimeService {
     }
   }
 
-  async getAllAvailableShowTime() {
+  async getAllAvailableShowTime(query:any) {
+    const {keyword} = query
     try {
       const currentDate =
         (new Date().getMonth() + 1 >= 10
@@ -104,13 +105,18 @@ export class ShowTimeService {
           ? new Date().getDate()
           : '0' + new Date().getDate()) +
         '/' +
-        new Date().getFullYear();
+        new Date().getFullYear(); 
       const result = await this.prisma.showTime.groupBy({
         by: ['movieId'],
         where: {
           date: {
             gte: currentDate,
           },
+          AND: [
+            {
+              ...(keyword ? { movieName: { contains: keyword } } : {}),
+            },
+          ],
         },
       });
       const resolveMovieIds = result.map(
